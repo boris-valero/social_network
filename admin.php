@@ -27,12 +27,7 @@
         </header>
 
         <?php
-        /**
-         * Etape 1: Ouvrir une connexion avec la base de donnée.
-         */
-        // on va en avoir besoin pour la suite
-        $mysqli = new mysqli("localhost", "root", "root", "socialnetwork");
-        //verification
+        $mysqli = new mysqli("localhost", "root", "Jvale2lppsc", "socialnetwork");
         if ($mysqli->connect_errno)
         {
             echo("Échec de la connexion : " . $mysqli->connect_error);
@@ -43,72 +38,66 @@
             <aside>
                 <h2>Mots-clés</h2>
                 <?php
-                /*
-                 * Etape 2 : trouver tous les mots clés
-                 */
-                $laQuestionEnSql = "SELECT * FROM `tags` LIMIT 50";
-                $lesInformations = $mysqli->query($laQuestionEnSql);
-                // Vérification
-                if ( ! $lesInformations)
-                {
-                    echo("Échec de la requete : " . $mysqli->error);
-                    exit();
-                }
+$laQuestionEnSql = "
+    SELECT tags.id, tags.label, COUNT(posts_tags.post_id) as message_count
+    FROM tags
+    LEFT JOIN posts_tags ON tags.id = posts_tags.tag_id
+    GROUP BY tags.id
+    LIMIT 50";
+$lesInformations = $mysqli->query($laQuestionEnSql);
+if ( ! $lesInformations)
+{
+    echo("Échec de la requete : " . $mysqli->error);
+    exit();
+} 
 
-                /*
-                 * Etape 3 : @todo : Afficher les mots clés en s'inspirant de ce qui a été fait dans news.php
-                 * Attention à en pas oublier de modifier tag_id=321 avec l'id du mot dans le lien
-                 */
-                while ($tag = $lesInformations->fetch_assoc())
-                {
-                    echo "<pre>" . print_r($tag, 1) . "</pre>";
-                    ?>
-                    <article>
-                        <h3>#chaussette</h3>
-                        <p>id:321</p>
-                        <nav>
-                            <a href="tags.php?tag_id=321">Messages</a>
-                        </nav>
-                    </article>
-                <?php } ?>
+while ($tag = $lesInformations->fetch_assoc()) {
+    ?>
+    <article>
+        <h3>#<?php echo htmlspecialchars($tag['label']); ?></h3>
+        <p>Numéro d'id du tag : <?php echo htmlspecialchars($tag['id']); ?></p>
+        <br>
+        <p>Nombre de messages : <?php echo htmlspecialchars($tag['message_count']); ?></p>
+        <nav>
+            <a href="tags.php?tag_id=<?php echo htmlspecialchars($tag['id']); ?>">Messages</a>
+        </nav>
+    </article>
+    <?php
+}
+                ?>
             </aside>
             <main>
-                <h2>Utilisatrices</h2>
-                <?php
-                /*
-                 * Etape 4 : trouver tous les mots clés
-                 * PS: on note que la connexion $mysqli à la base a été faite, pas besoin de la refaire.
-                 */
-                $laQuestionEnSql = "SELECT * FROM `users` LIMIT 50";
-                $lesInformations = $mysqli->query($laQuestionEnSql);
-                // Vérification
-                if ( ! $lesInformations)
-                {
-                    echo("Échec de la requete : " . $mysqli->error);
-                    exit();
-                }
+    <h2>Utilisateurs</h2>
+    <?php
+    $laQuestionEnSql = "SELECT * FROM `users` LIMIT 50";
+    $lesInformations = $mysqli->query($laQuestionEnSql);
+    if ( ! $lesInformations)
+    {
+        echo("Échec de la requete : " . $mysqli->error);
+        exit();
+    }
 
-                /*
-                 * Etape 5 : @todo : Afficher les utilisatrices en s'inspirant de ce qui a été fait dans news.php
-                 * Attention à en pas oublier de modifier dans le lien les "user_id=123" avec l'id de l'utilisatrice
-                 */
-                while ($tag = $lesInformations->fetch_assoc())
-                {
-                    echo "<pre>" . print_r($tag, 1) . "</pre>";
-                    ?>
-                    <article>
-                        <h3>Alexandra</h3>
-                        <p>id:123</p>
-                        <nav>
-                            <a href="wall.php?user_id=123">Mur</a>
-                            | <a href="feed.php?user_id=123">Flux</a>
-                            | <a href="settings.php?user_id=123">Paramètres</a>
-                            | <a href="followers.php?user_id=123">Suiveurs</a>
-                            | <a href="subscriptions.php?user_id=123">Abonnements</a>
-                        </nav>
-                    </article>
-                <?php } ?>
-            </main>
+    while ($user = $lesInformations->fetch_assoc())
+    {
+        ?>
+        <article>
+            <h3>Nom d'utilisateur : <?php echo htmlspecialchars($user['alias']); ?></h3>
+            <p>Numéro d'id de l'utilisateur : <?php echo htmlspecialchars($user['id']); ?></p>
+            <br>
+            <p>Adresse email : <?php echo htmlspecialchars($user['email']); ?></p>
+                      
+            <nav>
+                <a href="wall.php?user_id=<?php echo htmlspecialchars($user['id']); ?>">Mur</a>
+                | <a href="feed.php?user_id=<?php echo htmlspecialchars($user['id']); ?>">Flux</a>
+                | <a href="settings.php?user_id=<?php echo htmlspecialchars($user['id']); ?>">Paramètres</a>
+                | <a href="followers.php?user_id=<?php echo htmlspecialchars($user['id']); ?>">Suiveurs</a>
+                | <a href="subscriptions.php?user_id=<?php echo htmlspecialchars($user['id']); ?>">Abonnements</a>
+            </nav>
+        </article>
+        <?php
+    }
+    ?>
+</main>
         </div>
     </body>
 </html>
