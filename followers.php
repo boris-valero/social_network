@@ -1,10 +1,10 @@
 <?php $pageTitle = "Mes abonnés"; include 'header.php'; ?>         
             <aside>
-                <img src = "user.jpg" alt = "Portrait de l'utilisatrice"/>
+                <img src = "user.jpg" alt = "Portrait de l'utilisateur"/>
                 <section>
                     <h3>Présentation</h3>
                     <p>Sur cette page vous trouverez la liste des personnes qui
-                        suivent les messages de l'utilisatrice
+                        suivent les messages de l'utilisaeur
                         n° <?php echo intval($_GET['user_id']) ?></p>
 
                 </section>
