@@ -22,53 +22,32 @@
                     <li><a href="followers.php?user_id=5">Mes suiveurs</a></li>
                     <li><a href="subscriptions.php?user_id=5">Mes abonnements</a></li>
                 </ul>
-
             </nav>
         </header>
         <div id="wrapper">
             <?php
-            /**
-             * Cette page est similaire à wall.php ou feed.php 
-             * mais elle porte sur les mots-clés (tags)
-             */
-            /**
-             * Etape 1: Le mur concerne un mot-clé en particulier
-             */
             $tagId = intval($_GET['tag_id']);
             ?>
             <?php
-            /**
-             * Etape 2: se connecter à la base de donnée
-             */
-            $mysqli = new mysqli("localhost", "root", "root", "socialnetwork");
+            $mysqli = new mysqli("localhost", "root", "Jvale2lppsc", "socialnetwork");
             ?>
-
             <aside>
                 <?php
-                /**
-                 * Etape 3: récupérer le nom du mot-clé
-                 */
                 $laQuestionEnSql = "SELECT * FROM tags WHERE id= '$tagId' ";
                 $lesInformations = $mysqli->query($laQuestionEnSql);
                 $tag = $lesInformations->fetch_assoc();
-                //@todo: afficher le résultat de la ligne ci dessous, remplacer XXX par le label et effacer la ligne ci-dessous
-                echo "<pre>" . print_r($tag, 1) . "</pre>";
                 ?>
                 <img src="user.jpg" alt="Portrait de l'utilisatrice"/>
                 <section>
                     <h3>Présentation</h3>
                     <p>Sur cette page vous trouverez les derniers messages comportant
-                        le mot-clé XXX
+                        le mot-clé <?php echo htmlspecialchars($tag['label']) ?>
                         (n° <?php echo $tagId ?>)
                     </p>
-
                 </section>
             </aside>
             <main>
                 <?php
-                /**
-                 * Etape 3: récupérer tous les messages avec un mot clé donné
-                 */
                 $laQuestionEnSql = "
                     SELECT posts.content,
                     posts.created,
@@ -90,36 +69,32 @@
                 {
                     echo("Échec de la requete : " . $mysqli->error);
                 }
-
-                /**
-                 * Etape 4: @todo Parcourir les messsages et remplir correctement le HTML avec les bonnes valeurs php
-                 */
                 while ($post = $lesInformations->fetch_assoc())
                 {
-
-                    echo "<pre>" . print_r($post, 1) . "</pre>";
                     ?>                
                     <article>
                         <h3>
-                            <time datetime='2020-02-01 11:12:13' >31 février 2010 à 11h12</time>
+                            <time datetime='<?php echo htmlspecialchars($post['created']); ?>'>
+                                <?php echo htmlspecialchars($post['created']); ?>
+                            </time>
                         </h3>
-                        <address>par AreTirer</address>
+                        <address>par <?php echo htmlspecialchars($post['author_name']); ?></address>
                         <div>
-                            <p>Ceci est un paragraphe</p>
-                            <p>Ceci est un autre paragraphe</p>
-                            <p>... de toutes manières il faut supprimer cet 
-                                article et le remplacer par des informations en 
-                                provenance de la base de donnée</p>
+                            <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
                         </div>                                            
                         <footer>
-                            <small>♥ 132</small>
-                            <a href="">#lorem</a>,
-                            <a href="">#piscitur</a>,
+                            <small><?php echo intval($post['like_number']); ?> J'aime</small>
+                            <?php 
+                            $tags = explode(',', $post['taglist']);
+                            foreach ($tags as $tag) {
+                                echo '<a href="#">' . htmlspecialchars($tag) . '</a> ';
+                            }
+                            ?>
                         </footer>
                     </article>
-                <?php } ?>
-
-
+                <?php 
+                } 
+                ?>
             </main>
         </div>
     </body>
