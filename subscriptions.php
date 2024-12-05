@@ -22,7 +22,6 @@
                     <li><a href="followers.php?user_id=5">Mes suiveurs</a></li>
                     <li><a href="subscriptions.php?user_id=5">Mes abonnements</a></li>
                 </ul>
-
             </nav>
         </header>
         <div id="wrapper">
@@ -31,8 +30,8 @@
                 <section>
                     <h3>Présentation</h3>
                     <p>Sur cette page vous trouverez la liste des personnes dont
-                        l'utilisatrice
-                        n° <?php echo intval($_GET['user_id']) ?>
+                        l'utilisatrice n°
+                        <?php echo intval($_GET['user_id']) ?>
                         suit les messages
                     </p>
 
@@ -40,11 +39,8 @@
             </aside>
             <main class='contacts'>
                 <?php
-                // Etape 1: récupérer l'id de l'utilisateur
                 $userId = intval($_GET['user_id']);
-                // Etape 2: se connecter à la base de donnée
-                $mysqli = new mysqli("localhost", "root", "root", "socialnetwork");
-                // Etape 3: récupérer le nom de l'utilisateur
+                $mysqli = new mysqli("localhost", "root", "Jvale2lppsc", "socialnetwork");
                 $laQuestionEnSql = "
                     SELECT users.* 
                     FROM followers 
@@ -53,14 +49,20 @@
                     GROUP BY users.id
                     ";
                 $lesInformations = $mysqli->query($laQuestionEnSql);
-                // Etape 4: à vous de jouer
-                //@todo: faire la boucle while de parcours des abonnés et mettre les bonnes valeurs ci dessous 
+                if ( ! $lesInformations) {
+                    echo "Échec de la requête : " . $mysqli->error;
+                }
+                while ($abonne = $lesInformations->fetch_assoc())
+                {
+                    ?>                
+                    <article>
+                        <img src="user.jpg" alt="blason"/>
+                        <h3><?php echo htmlspecialchars($abonne['alias']); ?></h3>
+                        <p>id:<?php echo intval($abonne['id']); ?></p>                    
+                    </article>
+                <?php 
+                } 
                 ?>
-                <article>
-                    <img src="user.jpg" alt="blason"/>
-                    <h3>Alexandra</h3>
-                    <p>id:654</p>                    
-                </article>
             </main>
         </div>
     </body>
