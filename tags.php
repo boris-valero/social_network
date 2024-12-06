@@ -1,5 +1,4 @@
-<?php $pageTitle = "Les mots-clés";
-include 'header.php'; ?>
+<?php $pageTitle = "Les mots-clés"; include 'header.php'; ?> 
 <?php
 require_once 'config.php';
 require_once 'database.php';
@@ -11,10 +10,14 @@ $tagId = intval($_GET['tag_id']);
     <aside>
         <?php
         $laQuestionEnSql = "SELECT * FROM tags WHERE id= '$tagId' ";
-        $lesInformations = $mysqli->query($laQuestionEnSql);
+        $lesInformations = $db->query($laQuestionEnSql);
+        if (!$lesInformations) {
+            echo("Échec de la requête : " . $db->error);
+            exit();
+        }
         $tag = $lesInformations->fetch_assoc();
         ?>
-        <img src="user.jpg" alt="Portrait de l'utilisateur" />
+        <img src="user.jpg" alt="Portrait de l'utilisateur"/>
         <section>
             <h3>Présentation</h3>
             <p>Sur cette page vous trouverez les derniers messages comportant
@@ -26,27 +29,28 @@ $tagId = intval($_GET['tag_id']);
     <main>
         <?php
         $laQuestionEnSql = "
-                    SELECT posts.content,
-                    posts.created,
-                    users.alias as author_name,  
-                    count(likes.id) as like_number,  
-                    GROUP_CONCAT(DISTINCT tags.label) AS taglist 
-                    FROM posts_tags as filter 
-                    JOIN posts ON posts.id=filter.post_id
-                    JOIN users ON users.id=posts.user_id
-                    LEFT JOIN posts_tags ON posts.id = posts_tags.post_id  
-                    LEFT JOIN tags       ON posts_tags.tag_id  = tags.id 
-                    LEFT JOIN likes      ON likes.post_id  = posts.id 
-                    WHERE filter.tag_id = '$tagId' 
-                    GROUP BY posts.id
-                    ORDER BY posts.created DESC  
-                    ";
-        $lesInformations = $mysqli->query($laQuestionEnSql);
+            SELECT posts.content,
+            posts.created,
+            users.alias as author_name,  
+            count(likes.id) as like_number,  
+            GROUP_CONCAT(DISTINCT tags.label) AS taglist 
+            FROM posts_tags as filter 
+            JOIN posts ON posts.id=filter.post_id
+            JOIN users ON users.id=posts.user_id
+            LEFT JOIN posts_tags ON posts.id = posts_tags.post_id  
+            LEFT JOIN tags       ON posts_tags.tag_id  = tags.id 
+            LEFT JOIN likes      ON likes.post_id  = posts.id 
+            WHERE filter.tag_id = '$tagId' 
+            GROUP BY posts.id
+            ORDER BY posts.created DESC  
+            ";
+        $lesInformations = $db->query($laQuestionEnSql);
         if (!$lesInformations) {
-            echo ("Échec de la requete : " . $mysqli->error);
+            echo("Échec de la requête : " . $db->error);
+            exit();
         }
         while ($post = $lesInformations->fetch_assoc()) {
-            ?>
+            ?>                
             <article>
                 <h3>
                     <time datetime='<?php echo htmlspecialchars($post['created']); ?>'>
@@ -56,10 +60,10 @@ $tagId = intval($_GET['tag_id']);
                 <address>par <?php echo htmlspecialchars($post['author_name']); ?></address>
                 <div>
                     <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
-                </div>
+                </div>                                            
                 <footer>
                     <small><?php echo intval($post['like_number']); ?> J'aime</small>
-                    <?php
+                    <?php 
                     $tags = explode(',', $post['taglist']);
                     foreach ($tags as $tag) {
                         echo '<a href="#">' . htmlspecialchars($tag) . '</a> ';
@@ -67,8 +71,9 @@ $tagId = intval($_GET['tag_id']);
                     ?>
                 </footer>
             </article>
-            <?php
-        }
+        <?php 
+        } 
         ?>
     </main>
-    <?php include 'footer.php'; ?>
+</div>
+<?php include 'footer.php'; ?>
