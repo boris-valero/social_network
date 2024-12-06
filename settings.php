@@ -1,24 +1,24 @@
-<?php $pageTitle = "Mes paramètres"; include 'header.php'; ?>
-        <div id="wrapper" class='profile'>
+<?php $pageTitle = "Mes paramètres";
+include 'header.php'; ?>
+<?php
+require_once 'config.php';
+require_once 'database.php';
 
-
-            <aside>
-                <img src="user.jpg" alt="Portrait de l'utilisateur"/>
-                <section>
-                    <h3>Présentation</h3>
-                    <p>Sur cette page vous trouverez les informations de l'utilisateur
-                        n° <?php echo intval($_GET['user_id']) ?></p>
-
-                </section>
-            </aside>
-            <main>
-                <?php
-
-                $userId = intval($_GET['user_id']);
-
-                $mysqli = new mysqli("localhost", "root", "Jvale2lppsc", "socialnetwork");
-
-                $laQuestionEnSql = "
+$db = new Database();
+?>
+<div id="wrapper" class='profile'>
+    <aside>
+        <img src="user.jpg" alt="Portrait de l'utilisateur" />
+        <section>
+            <h3>Présentation</h3>
+            <p>Sur cette page vous trouverez les informations de l'utilisateur
+                n° <?php echo intval($_GET['user_id']) ?></p>
+        </section>
+    </aside>
+    <main>
+        <?php
+        $userId = intval($_GET['user_id']);
+        $laQuestionEnSql = "
                     SELECT users.*, 
                     count(DISTINCT posts.id) as totalpost, 
                     count(DISTINCT given.post_id) as totalgiven, 
@@ -30,22 +30,21 @@
                     WHERE users.id = '$userId' 
                     GROUP BY users.id
                     ";
-                $lesInformations = $mysqli->query($laQuestionEnSql);
-                if ( ! $lesInformations)
-                {
-                    echo("Échec de la requete : " . $mysqli->error);
-                }
-                $user = $lesInformations->fetch_assoc();
-                ?>                
-                <article class='parameters'>
-                    <h3>Mes paramètres</h3>
-                    <dl>
-                        <dt>Pseudo</dt> : <dd><?php echo htmlspecialchars($user['alias']); ?></dd>
-                        <dt>Email</dt> : <dd><?php echo htmlspecialchars($user['email']); ?></dd>
-                        <dt>Nombre de message</dt> : <dd><?php echo intval($user['totalpost']); ?></dd>
-                        <dt>Nombre de "J'aime" donnés </dt> : <dd><?php echo intval($user['totalgiven']); ?></dd>
-                        <dt>Nombre de "J'aime" reçus</dt> : <dd><?php echo intval($user['totalrecieved']); ?></dd>
-                     </dl>
-                </article>
-            </main>
-<?php include 'footer.php'; ?>
+        $lesInformations = $mysqli->query($laQuestionEnSql);
+        if (!$lesInformations) {
+            echo ("Échec de la requete : " . $mysqli->error);
+        }
+        $user = $lesInformations->fetch_assoc();
+        ?>
+        <article class='parameters'>
+            <h3>Mes paramètres</h3>
+            <dl>
+                <dt>Pseudo</dt> : <dd><?php echo htmlspecialchars($user['alias']); ?></dd>
+                <dt>Email</dt> : <dd><?php echo htmlspecialchars($user['email']); ?></dd>
+                <dt>Nombre de message</dt> : <dd><?php echo intval($user['totalpost']); ?></dd>
+                <dt>Nombre de "J'aime" donnés </dt> : <dd><?php echo intval($user['totalgiven']); ?></dd>
+                <dt>Nombre de "J'aime" reçus</dt> : <dd><?php echo intval($user['totalrecieved']); ?></dd>
+            </dl>
+        </article>
+    </main>
+    <?php include 'footer.php'; ?>
