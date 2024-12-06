@@ -1,25 +1,24 @@
-<?php $pageTitle = "Mes actualités"; include 'header.php'; ?>
-        <div id="wrapper">
-            <aside>
-                <img src="user.jpg" alt="Portrait de l'utilisateur"/>
-                <section>
-                    <h3>Présentation</h3>
-                    <p>Sur cette page vous trouverez les derniers messages de
-                        tous les utilisateur du site.</p>
-                </section>
-            </aside>
-            <main>
-                <?php
-                $mysqli = new mysqli("localhost", "root", "Jvale2lppsc", "socialnetwork");
-                if ($mysqli->connect_errno)
-                {
-                    echo "<article>";
-                    echo("Échec de la connexion : " . $mysqli->connect_error);
-                    echo("<p>Indice: Vérifiez les parametres de <code>new mysqli(...</code></p>");
-                    echo "</article>";
-                    exit();
-                }
-                $laQuestionEnSql = "
+<?php $pageTitle = "Mes actualités";
+include 'header.php'; ?>
+<?php
+require_once 'config.php';
+require_once 'database.php';
+
+$db = new Database();
+?>
+<div id="wrapper">
+    <aside>
+        <img src="user.jpg" alt="Portrait de l'utilisateur" />
+        <section>
+            <h3>Présentation</h3>
+            <p>
+                Sur cette page vous trouverez les derniers messages de tous les utilisateur du site.
+            </p>
+        </section>
+    </aside>
+    <main>
+        <?php
+        $laQuestionEnSql = "
                     SELECT posts.content,
                     posts.created,
                     users.alias as author_name,  
@@ -34,32 +33,30 @@
                     ORDER BY posts.created DESC  
                     LIMIT 5
                     ";
-                $lesInformations = $mysqli->query($laQuestionEnSql);
-                if ( ! $lesInformations)
-                {
-                    echo "<article>";
-                    echo("Échec de la requete : " . $mysqli->error);
-                    echo("<p>Indice: Vérifiez la requete  SQL suivante dans phpmyadmin<code>$laQuestionEnSql</code></p>");
-                    exit();
-                }
-                while ($post = $lesInformations->fetch_assoc())
-                {
-                    ?>
-                    <article>
-                        <h3>
-                            <time><?php echo $post['created'] ?></time>
-                        </h3>
-                        <address><?php echo $post['author_name'] ?></address>
-                        <div>
-                            <p><?php echo $post['content'] ?></p>
-                        </div>
-                        <footer>
-                            <small><?php echo $post['like_number'] ?></small>
-                            <a href=""><?php echo $post['taglist'] ?></a>,
-                        </footer>
-                    </article>
-                    <?php
-                }
-                ?>
-            </main>
-<?php include 'footer.php'; ?>
+        $lesInformations = $mysqli->query($laQuestionEnSql);
+        if (!$lesInformations) {
+            echo "<article>";
+            echo ("Échec de la requete : " . $mysqli->error);
+            echo ("<p>Indice: Vérifiez la requete  SQL suivante dans phpmyadmin<code>$laQuestionEnSql</code></p>");
+            exit();
+        }
+        while ($post = $lesInformations->fetch_assoc()) {
+            ?>
+            <article>
+                <h3>
+                    <time><?php echo $post['created'] ?></time>
+                </h3>
+                <address><?php echo $post['author_name'] ?></address>
+                <div>
+                    <p><?php echo $post['content'] ?></p>
+                </div>
+                <footer>
+                    <small><?php echo $post['like_number'] ?></small>
+                    <a href=""><?php echo $post['taglist'] ?></a>,
+                </footer>
+            </article>
+            <?php
+        }
+        ?>
+    </main>
+    <?php include 'footer.php'; ?>
