@@ -36,7 +36,7 @@ $userId = intval($_GET['user_id']);
             ?>                
             <article>
                 <img src="user.jpg" alt="blason"/>
-                <h3><?php echo htmlspecialchars($abonne['alias']); ?></h3>
+                <h3><a href="wall.php?user_id=<?php echo intval($abonne['id']); ?>"><?php echo htmlspecialchars($abonne['alias']); ?></a></h3>
                 <p>id:<?php echo intval($abonne['id']); ?></p>                    
             </article>
         <?php 
