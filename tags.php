@@ -31,9 +31,11 @@ $tagId = intval($_GET['tag_id']);
         $laQuestionEnSql = "
             SELECT posts.content,
             posts.created,
+            posts.user_id,
             users.alias as author_name,  
             count(likes.id) as like_number,  
-            GROUP_CONCAT(DISTINCT tags.label) AS taglist 
+            GROUP_CONCAT(DISTINCT tags.label ORDER BY tags.label) AS taglist,
+            GROUP_CONCAT(DISTINCT tags.id ORDER BY tags.label) AS tag_ids
             FROM posts_tags as filter 
             JOIN posts ON posts.id=filter.post_id
             JOIN users ON users.id=posts.user_id
@@ -57,7 +59,7 @@ $tagId = intval($_GET['tag_id']);
                         <?php echo htmlspecialchars($post['created']); ?>
                     </time>
                 </h3>
-                <address>par <?php echo htmlspecialchars($post['author_name']); ?></address>
+                <address>par <a href="wall.php?user_id=<?php echo intval($post['user_id']); ?>"><?php echo htmlspecialchars($post['author_name']); ?></a></address>
                 <div>
                     <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
                 </div>                                            
@@ -65,8 +67,10 @@ $tagId = intval($_GET['tag_id']);
                     <small><?php echo intval($post['like_number']); ?> J'aime</small>
                     <?php 
                     $tags = explode(',', $post['taglist']);
-                    foreach ($tags as $tag) {
-                        echo '<a href="#">' . htmlspecialchars($tag) . '</a> ';
+                    $tag_ids = explode(',', $post['tag_ids']);
+                    foreach ($tags as $index => $tag) {
+                        $tag_id = intval($tag_ids[$index]);
+                        echo '<a href="tag.php?id=' . $tag_id . '">' . htmlspecialchars($tag) . '</a> ';
                     }
                     ?>
                 </footer>
