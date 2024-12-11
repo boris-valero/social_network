@@ -47,8 +47,8 @@ $db = new Database();
         while ($user = $lesInformations->fetch_assoc()) {
             ?>
             <article>
-                <h3>Nom d'utilisateur : <?php echo htmlspecialchars($user['alias']); ?></h3>
-                <p>Numéro d'id de l'utilisateur : <?php echo htmlspecialchars($user['id']); ?></p>
+            <h3>Nom d'utilisateur : <a href="wall.php?user_id=<?php echo htmlspecialchars($user['id']); ?>"><?php echo htmlspecialchars($user['alias']); ?></a></h3>
+            <p>Numéro d'id de l'utilisateur : <?php echo htmlspecialchars($user['id']); ?></p>
                 <br>
                 <p>Adresse email : <?php echo htmlspecialchars($user['email']); ?></p>
                 <br>
