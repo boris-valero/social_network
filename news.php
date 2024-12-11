@@ -19,9 +19,11 @@ $db = new Database();
         $laQuestionEnSql = "
             SELECT posts.content,
             posts.created,
+            posts.user_id,
             users.alias as author_name,  
             count(likes.id) as like_number,  
-            GROUP_CONCAT(DISTINCT tags.label) AS taglist 
+            GROUP_CONCAT(DISTINCT tags.label ORDER BY tags.label) AS taglist,
+            GROUP_CONCAT(DISTINCT tags.id ORDER BY tags.label) AS tag_ids
             FROM posts
             JOIN users ON  users.id=posts.user_id
             LEFT JOIN posts_tags ON posts.id = posts_tags.post_id  
@@ -35,29 +37,37 @@ $db = new Database();
         if (!$lesInformations) {
             echo "<article>";
             echo("Échec de la requête : " . $db->error);
-            echo("<p>Indice: Vérifiez la requête SQL suivante dans phpmyadmin<code>$laQuestionEnSql</code></p>");
             echo "</article>";
-            exit();
-        }
-        while ($post = $lesInformations->fetch_assoc()) {
-            ?>                
-            <article>
+        } else {
+            while ($post = $lesInformations->fetch_assoc()) {
+                ?>
+                <article>
                 <h3>
-                    <time datetime='<?php echo htmlspecialchars($post['created']); ?>'>
-                        <?php echo htmlspecialchars($post['created']); ?>
-                    </time>
+                    <time><?php echo htmlspecialchars($post['created']); ?></time>
                 </h3>
-                <address>par <?php echo htmlspecialchars($post['author_name']); ?></address>
+                <address>
+                    <a href="wall.php?user_id=<?php echo intval($post['user_id']); ?>"><?php echo htmlspecialchars($post['author_name']); ?></a>
+                </address>
                 <div>
                     <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
-                </div>                                            
+                </div>
                 <footer>
                     <small><?php echo intval($post['like_number']); ?> J'aime</small>
-                    <a href="#"><?php echo htmlspecialchars($post['taglist']); ?></a>
+                    <small style="float: right;">
+                        <?php
+                        $tags = explode(',', $post['taglist']);
+                        $tag_ids = explode(',', $post['tag_ids']);
+                        foreach ($tags as $index => $tag) {
+                            $tag_id = intval($tag_ids[$index]);
+                            echo '<a href="tags.php?tag_id=' . $tag_id . '">' . htmlspecialchars($tag) . '</a> ';
+                        }
+                        ?>
+                    </small>
                 </footer>
-            </article>
-        <?php 
-        } 
+                </article>
+                <?php
+            }
+        }
         ?>
     </main>
 </div>
