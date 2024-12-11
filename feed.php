@@ -71,7 +71,7 @@ $userId = intval($_GET['user_id']);
                         $tag_ids = explode(',', $post['tag_ids']);
                         foreach ($tags as $index => $tag) {
                             $tag_id = intval($tag_ids[$index]);
-                            echo '<a href="tag.php?id=' . $tag_id . '">' . htmlspecialchars($tag) . '</a> ';
+                            echo '<a href="tags.php?tag_id=' . $tag_id . '">' . htmlspecialchars($tag) . '</a> ';
                         }
                         ?>
                     </small>
