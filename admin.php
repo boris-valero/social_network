@@ -49,8 +49,9 @@ $db = new Database();
             <article>
                 <h3>Nom d'utilisateur : <?php echo htmlspecialchars($user['alias']); ?></h3>
                 <p>Numéro d'id de l'utilisateur : <?php echo htmlspecialchars($user['id']); ?></p>
+                <br>
                 <p>Adresse email : <?php echo htmlspecialchars($user['email']); ?></p>
-                          
+                <br>
                 <nav>
                     <a href="wall.php?user_id=<?php echo htmlspecialchars($user['id']); ?>">Mur</a>
                     | <a href="feed.php?user_id=<?php echo htmlspecialchars($user['id']); ?>">Flux</a>
