@@ -37,15 +37,34 @@ Ce projet est un réseau social développé en PHP avec une architecture modern 
 
 ### Installation et Lancement
 
+**1. Accéder au projet**
 ```bash
-# 1. Cloner/accéder au projet
 cd /path/to/social_network
+```
 
-# 2. Lancez la commande suivante :
+**2. Générer un mot de passe fort**
+```bash
+openssl rand -base64 32
+```
+
+**3. Configurer l'environnement**
+```bash
+# Copier le fichier template
+cp .env.example .env
+
+# Modifier .env avec le mot de passe généré
+nano .env  # ou vim .env
+```
+
+**4. Lancer l'application**
+```bash
 docker-compose up -d
+```
 
-# 3. Attendre 30 secondes, puis ouvrir
-# http://localhost:8080
+**5. Accéder au site**
+```
+Attendre 30 secondes, puis ouvrir:
+http://localhost:8080
 ```
 
 ### Arrêter
