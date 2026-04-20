@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Service PHP/Apache
+  app:
+    build: .
+    container_name: social_network_app
+    ports:
+      - "8080:80"
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - social_network_network
+    restart: unless-stopped
+
+  # Service MySQL/MariaDB
+  db:
+    image: mysql:8.0
+    container_name: social_network_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - social_network_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+volumes:
+  db_data:
+
+networks:
+  social_network_network:
+    driver: bridge

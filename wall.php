@@ -9,13 +9,21 @@ $userId = intval($_GET['user_id']);
 <div id="wrapper">
     <aside>
         <?php
-        $laQuestionEnSql = "SELECT * FROM users WHERE id= '$userId' ";
-        $lesInformations = $db->query($laQuestionEnSql);
-        if (!$lesInformations) {
-            echo("Échec de la requête : " . $db->error);
+        $userId = intval($_GET['user_id']);
+        $laQuestionEnSql = "SELECT * FROM users WHERE id = ?";
+        
+        // Préparer la requête pour éviter l'injection SQL
+        $stmt = $db->prepare($laQuestionEnSql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $lesInformations = $stmt->get_result();
+        $user = $lesInformations->fetch_assoc();
+        $stmt->close();
+        
+        if (!$user) {
+            echo "<p>Utilisateur non trouvé.</p>";
             exit();
         }
-        $user = $lesInformations->fetch_assoc();
         ?>
         <img src="user.jpg" alt="Portrait de l'utilisateur"/>
         <section>

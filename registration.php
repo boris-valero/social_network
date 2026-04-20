@@ -37,32 +37,64 @@
                     <?php
                     require_once 'config.php';
 
-                    $enCoursDeTraitement = isset($_POST['email']);
+                    $enCoursDeTraitement = isset($_POST['email']) && isset($_POST['pseudo']) && isset($_POST['motpasse']);
+                    $error_message = '';
+                    $success_message = '';
+                    
                     if ($enCoursDeTraitement)
                     {
-                        $new_email = $_POST['email'];
-                        $new_alias = $_POST['pseudo'];
+                        $new_email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
+                        $new_alias = trim($_POST['pseudo']);
                         $new_passwd = $_POST['motpasse'];
-
-                        $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-                        $new_email = $mysqli->real_escape_string($new_email);
-                        $new_alias = $mysqli->real_escape_string($new_alias);
-                        $new_passwd = $mysqli->real_escape_string($new_passwd);
-                        $new_passwd = md5($new_passwd);
-                        $lInstructionSql = "INSERT INTO users (id, email, password, alias) "
-                                . "VALUES (NULL, "
-                                . "'" . $new_email . "', "
-                                . "'" . $new_passwd . "', "
-                                . "'" . $new_alias . "'"
-                                . ");";
-                        $ok = $mysqli->query($lInstructionSql);
-                        if ( ! $ok)
-                        {
-                            echo "L'inscription a échouée : " . $mysqli->error;
-                        } else
-                        {
-                            echo "Votre inscription est un succès : " . $new_alias;
-                            echo " <a href='login.php'>Connectez-vous.</a>";
+                        
+                        // Validation
+                        if (!filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
+                            $error_message = "Email invalide.";
+                        } else if (strlen($new_alias) < 3 || strlen($new_alias) > 50) {
+                            $error_message = "Le pseudo doit contenir entre 3 et 50 caractères.";
+                        } else if (strlen($new_passwd) < 8) {
+                            $error_message = "Le mot de passe doit contenir au moins 8 caractères.";
+                        } else {
+                            $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+                            if ($mysqli->connect_errno) {
+                                $error_message = "Erreur de connexion à la base de données.";
+                            } else {
+                                // Vérifier si l'email existe déjà
+                                $stmt_check = $mysqli->prepare("SELECT id FROM users WHERE email=?");
+                                $stmt_check->bind_param("s", $new_email);
+                                $stmt_check->execute();
+                                $stmt_check->store_result();
+                                
+                                if ($stmt_check->num_rows > 0) {
+                                    $error_message = "Cet email est déjà utilisé.";
+                                } else {
+                                    // Hacher le mot de passe avec bcrypt
+                                    $hashed_passwd = password_hash($new_passwd, PASSWORD_BCRYPT);
+                                    
+                                    // Prepared statement pour l'insertion
+                                    $stmt = $mysqli->prepare("INSERT INTO users (email, password, alias) VALUES (?, ?, ?)");
+                                    if ($stmt) {
+                                        $stmt->bind_param("sss", $new_email, $hashed_passwd, $new_alias);
+                                        if ($stmt->execute()) {
+                                            $success_message = "Votre inscription est un succès : " . htmlspecialchars($new_alias) . " <a href='login.php'>Connectez-vous.</a>";
+                                        } else {
+                                            $error_message = "L'inscription a échouée : " . $stmt->error;
+                                        }
+                                        $stmt->close();
+                                    } else {
+                                        $error_message = "Erreur préparation requête : " . $mysqli->error;
+                                    }
+                                }
+                                $stmt_check->close();
+                                $mysqli->close();
+                            }
+                        }
+                        
+                        if ($error_message) {
+                            echo "<p style='color: red;'>" . htmlspecialchars($error_message) . "</p>";
+                        }
+                        if ($success_message) {
+                            echo "<p style='color: green;'>" . $success_message . "</p>";
                         }
                     }
                     ?>                     

@@ -17,8 +17,16 @@ class Database {
         return $result;
     }
 
+    public function prepare($sql) {
+        return $this->connection->prepare($sql);
+    }
+
     public function escape_string($string) {
         return $this->connection->real_escape_string($string);
+    }
+
+    public function close() {
+        $this->connection->close();
     }
 }
 ?>

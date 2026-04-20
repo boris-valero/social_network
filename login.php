@@ -40,31 +40,46 @@ session_start();
                     <?php
                     require_once 'config.php';
 
-                    $enCoursDeTraitement = isset($_POST['email']);
+                    $enCoursDeTraitement = isset($_POST['email']) && isset($_POST['motdepasse']);
+                    $error_message = '';
+                    
                     if ($enCoursDeTraitement)
                     {
-                        $emailAVerifier = $_POST['email'];
+                        $emailAVerifier = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
                         $passwdAVerifier = $_POST['motdepasse'];
-                        $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-                        $emailAVerifier = $mysqli->real_escape_string($emailAVerifier);
-                        $passwdAVerifier = $mysqli->real_escape_string($passwdAVerifier);
-                        $passwdAVerifier = md5($passwdAVerifier);
-                        $lInstructionSql = "SELECT * FROM users WHERE email='$emailAVerifier' AND password='$passwdAVerifier'";
-                        $res = $mysqli->query($lInstructionSql);
-                        if ( ! $res)
-                        {
-                            echo "Erreur SQL : " . $mysqli->error;
-                        } else
-                        {
-                            $user = $res->fetch_assoc();
-                            if ( ! $user)
-                            {
-                                echo "La connexion a échouée. ";
-                            } else
-                            {
-                                echo "Connexion réussie : " . $user['alias'];
-                                $_SESSION['connected_id'] = $user['id'];
+                        
+                        // Validation email
+                        if (!filter_var($emailAVerifier, FILTER_VALIDATE_EMAIL)) {
+                            $error_message = "Email invalide.";
+                        } else {
+                            $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+                            if ($mysqli->connect_errno) {
+                                $error_message = "Erreur de connexion à la base de données.";
+                            } else {
+                                // Prepared statement pour éviter l'injection SQL
+                                $stmt = $mysqli->prepare("SELECT id, alias, password FROM users WHERE email=?");
+                                if ($stmt) {
+                                    $stmt->bind_param("s", $emailAVerifier);
+                                    $stmt->execute();
+                                    $res = $stmt->get_result();
+                                    $user = $res->fetch_assoc();
+                                    
+                                    if ($user && password_verify($passwdAVerifier, $user['password'])) {
+                                        echo "Connexion réussie : " . htmlspecialchars($user['alias']);
+                                        $_SESSION['connected_id'] = $user['id'];
+                                    } else {
+                                        $error_message = "La connexion a échouée.";
+                                    }
+                                    $stmt->close();
+                                } else {
+                                    $error_message = "Erreur préparation requête : " . $mysqli->error;
+                                }
+                                $mysqli->close();
                             }
+                        }
+                        
+                        if ($error_message) {
+                            echo "<p style='color: red;'>" . htmlspecialchars($error_message) . "</p>";
                         }
                     }
                     ?>                     

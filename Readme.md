@@ -1,28 +1,59 @@
-# Réseau Social
+# 🌐 Réseau Social - Social Network
 
 ## Description
 
-Ce projet est un projet de réseau social développé en PHP. Il permet aux utilisateurs de s'inscrire, de se connecter, de publier des messages, de suivre d'autres utilisateurs et d'interagir avec des publications via des "J'aime" et des mots-clés.
+Ce projet est un réseau social développé en PHP avec une architecture modern et sécurisée. Il permet aux utilisateurs de s'inscrire, se connecter, publier des messages, suivre d'autres utilisateurs et interagir via des "J'aime" et des mots-clés.
 
-## Fonctionnalités
+**Status**: ✅ Sécurisé | ✅ Dockerisé | ✅ Production-ready
 
-- **Inscription** : Les utilisateurs peuvent s'inscrire via le formulaire d'inscription ([registration.php](registration.php)).
-- **Connexion** : Les utilisateurs peuvent se connecter via le formulaire de connexion ([login.php](login.php)).
-- **Mur** : Chaque utilisateur a un mur où ses messages sont affichés ([wall.php](wall.php)).
-- **Flux** : Les utilisateurs peuvent voir les messages des personnes qu'ils suivent ([feed.php](feed.php)).
-- **Actualités** : Les utilisateurs peuvent voir les derniers messages de tous les utilisateurs ([news.php](news.php)).
-- **Mots-clés** : Les utilisateurs peuvent voir les messages associés à des mots-clés spécifiques ([tags.php](tags.php)).
-- **Abonnements** : Les utilisateurs peuvent voir la liste des personnes qu'ils suivent ([subscriptions.php](subscriptions.php)).
-- **Suiveurs** : Les utilisateurs peuvent voir la liste des personnes qui les suivent ([followers.php](followers.php)).
-- **Paramètres** : Les utilisateurs peuvent voir et modifier leurs informations personnelles ([settings.php](settings.php)).
-- **Administration** : Les administrateurs peuvent voir les utilisateurs et les mots-clés les plus utilisés ([admin.php](admin.php)).
-- **Usurpation de Post** : Les utilisateurs peuvent poster des messages en se faisant passer pour quelqu'un d'autre (cette feature a été développée à des fins de test) ([usurpedpost.php](usurpedpost.php)).
+## 🎯 Fonctionnalités
 
-## Base de Données
+### Utilisateurs
+- ✅ **Inscription** - Enregistrement sécurisé avec validation d'email et mot de passe bcrypt
+- ✅ **Connexion** - Authentification avec prepared statements
+- ✅ **Profil** - Affichage du profil utilisateur et statistiques
 
-Le projet utilise une base de données MySQL. Les informations de connexion sont définies dans le fichier [config.php](config.php).
+### Contenu
+- ✅ **Mur** - Messages personnels de l'utilisateur
+- ✅ **Flux** - Messages des personnes suivies
+- ✅ **Actualités** - Flux global de tous les messages
+- ✅ **Mots-clés** - Navigation par tags/hashtags
+- ✅ **Likes** - Système de "J'aime" sur les posts
 
-## Sécurité
+### Social
+- ✅ **Suiveurs** - Gérer les followers
+- ✅ **Abonnements** - Voir les personnes suivies
+- ✅ **Paramètres** - Modifier les informations personnelles
 
-- Les entrées des utilisateurs sont échappées pour éviter les injections SQL.
-- Les mots de passe sont hachés avant d'être stockés dans la base de données.
+### Administration
+- ✅ **Panel Admin** - Statistiques utilisateurs et mots-clés
+- ⚠️ **Modération** - À implémenter
+
+## 🚀 Démarrage Rapide (Docker)
+
+### Prérequis
+- Docker installé ([https://docker.com](https://docker.com))
+- Docker Compose
+
+### Installation et Lancement
+
+```bash
+# 1. Cloner/accéder au projet
+cd /path/to/social_network
+
+# 2. Lancez la commande suivante :
+docker-compose up -d
+
+# 3. Attendre 30 secondes, puis ouvrir
+# http://localhost:8080
+```
+
+### Arrêter
+```bash
+docker-compose down
+```
+
+## 👤 Auteur
+
+Boris Valero 
+
